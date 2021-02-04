@@ -906,8 +906,14 @@ function populateShopList()
 				price = price * (math.max(item.parameters.level * 0.5, 1))
 			end
 			price = calculateShopPrice(price, true,pricePcnt)
-
-			widget.setText(listItem..".name", item.parameters.shortdescription or "")
+			--sb.logInfo("itemData:%s",item)
+			local itemName=item.parameters.shortdescription
+			if not itemName then
+				local itemRoot=root.itemConfig(item)
+				--sb.logInfo("%s",itemRoot)
+				itemName=itemRoot.config.shortdescription or ""
+			end
+			widget.setText(listItem..".name", itemName)
 			widget.setItemSlotItem(listItem..".item", item)
 			widget.setText(listItem..".price", price)
 			widget.setData(listItem, { name = item.name, price = price, maxStack = 1, isWeapon = true })
@@ -1228,7 +1234,7 @@ function calculateSellPrice()
 			local slotItem = widget.itemSlotItem("shopSellSlot"..row..column)
 			if slotItem then
 				local config = root.itemConfig(slotItem.name)
-				local itemPrice = config.config.price
+				local itemPrice = (slotItem.parameters and slotItem.parameters.price) or config.config.price
 				if itemPrice then
 					total = itemPrice * slotItem.count + total
 				end
@@ -1249,7 +1255,7 @@ function shopSell()
 			local slotItem = widget.itemSlotItem("shopSellSlot"..row..column)
 			if slotItem then
 				local config = root.itemConfig(slotItem.name)
-				local itemPrice = config.config.price
+				local itemPrice = (slotItem.parameters and slotItem.parameters.price) or config.config.price
 				if itemPrice then
 					money = itemPrice * slotItem.count + money
 				end
